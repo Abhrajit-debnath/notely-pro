@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { theme } from "./theme";
 import "./globals.css";
+import QueryProvider from "@/components/providers/apiClient/QueryProvider";
 
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -29,8 +30,11 @@ export default function RootLayout({
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>
       <body className="min-h-full flex flex-col">
-        <MantineProvider theme={theme} defaultColorScheme="dark">{children}
-        </MantineProvider></body>
+        <QueryProvider>
+          <MantineProvider theme={theme} defaultColorScheme="dark">{children}
+          </MantineProvider>
+        </QueryProvider>
+      </body>
     </html>
   );
 }

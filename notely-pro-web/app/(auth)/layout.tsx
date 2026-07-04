@@ -1,7 +1,7 @@
 import BackgroundEffect from "@/components/auth/effects/BackgroundEffect";
 import LogoTextEffect from "@/components/auth/effects/LogoEffect";
 import { Paper, Box, Text, Title, Flex } from "@mantine/core";
-import AuthProvider from "./providers/AuthProvider";
+import AuthProvider from "../../components/providers/auth/AuthProvider";
 
 
 export default function AuthLayout({ children }: {

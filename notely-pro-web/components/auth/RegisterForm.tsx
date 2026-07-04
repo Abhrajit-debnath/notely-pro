@@ -1,3 +1,5 @@
+"use client"
+
 import { TextInput, PasswordInput, Button, Divider, Anchor, Text, Title, Stack, Box, Group, UnstyledButton, Flex, Center } from "@mantine/core";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
