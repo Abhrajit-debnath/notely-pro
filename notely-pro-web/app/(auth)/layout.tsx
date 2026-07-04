@@ -1,6 +1,8 @@
 import BackgroundEffect from "@/components/auth/effects/BackgroundEffect";
 import LogoTextEffect from "@/components/auth/effects/LogoEffect";
 import { Paper, Box, Text, Title, Flex } from "@mantine/core";
+import AuthProvider from "./providers/AuthProvider";
+
 
 export default function AuthLayout({ children }: {
     children: React.ReactNode
@@ -58,7 +60,12 @@ export default function AuthLayout({ children }: {
                 {/* Right Side: Form Content (Full-width on mobile) */}
                 <Box className="w-full md:w-1/2 flex items-center justify-center p-8 md:p-12 bg-white dark:bg-neutral-900 transition-colors duration-300">
                     <Box className="w-full max-w-90">
-                        {children}
+
+                        <AuthProvider>
+                            {children}
+                        </AuthProvider>
+
+
                     </Box>
                 </Box>
             </Paper>
