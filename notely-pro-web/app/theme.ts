@@ -15,47 +15,26 @@ const notelyPrimary: MantineColorsTuple = [
 
 
 export const theme = createTheme({
-
     primaryColor: 'notely',
-
     colors: {
-
         notely: notelyPrimary,
-
     },
-
-    fontFamily: 'var(--font-geist-sans), sans-serif',
-
+    fontFamily: "var(--font-plus-jakarta), sans-serif",
     fontFamilyMonospace: 'var(--font-geist-mono), Courier, monospace',
-
     defaultRadius: 'md',
-
     components: {
-
         // Customize default component props 
-
         Button: {
-
             defaultProps: {
-
                 loaderProps: { type: 'dots' },
-
             },
-
         },
-
         Card: {
-
             defaultProps: {
-
                 withBorder: true,
-
                 shadow: 'sm',
-
             },
-
         },
-
     },
 
 });
