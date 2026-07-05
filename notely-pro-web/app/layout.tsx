@@ -3,7 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { theme } from "./theme";
 import "./globals.css";
-import QueryProvider from "@/components/providers/apiClient/QueryProvider";
+import QueryProvider from "@/components/providers/queryClient/QueryProvider";
 
 
 const plusJakartaSans = Plus_Jakarta_Sans({
