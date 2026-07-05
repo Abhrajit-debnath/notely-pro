@@ -1,16 +1,16 @@
 import { createTheme, MantineColorsTuple } from '@mantine/core';
 
 const notelyPrimary: MantineColorsTuple = [
-    '#f3f0ff',
-    '#e5dbff',
-    '#d0bfff',
-    '#b197fc',
-    '#94d82d', // Accent hint or highlight
-    '#7048e8',
-    '#5f3dc4', // Primary brand color
-    '#512da8',
-    '#4527a0',
-    '#311b92',
+    '#eef2ff', // 50
+    '#e0e7ff', // 100
+    '#c7d2fe', // 200
+    '#a5b4fc', // 300
+    '#818cf8', // 400
+    '#6366f1', // 500
+    '#4f39f6', // 600 - Primary brand color
+    '#3f2bd2', // 700 - Hover state
+    '#3221a6', // 800
+    '#201569', // 900
 ];
 
 

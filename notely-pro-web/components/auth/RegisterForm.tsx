@@ -52,7 +52,7 @@ export default function RegisterForm() {
                 className="font-sans"
                 classNames={{
                     label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
-                    input: "bg-neutral-50 dark:bg-neutral-950 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 border-neutral-200 dark:border-neutral-800 transition-colors"
+                    input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors"
                 }}
             />
 
@@ -65,7 +65,7 @@ export default function RegisterForm() {
                 className="font-sans"
                 classNames={{
                     label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
-                    input: "bg-neutral-50 dark:bg-neutral-950 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 border-neutral-200 dark:border-neutral-800 transition-colors",
+                    input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors",
                     innerInput: "bg-transparent border-0"
                 }}
             />
@@ -131,7 +131,7 @@ export default function RegisterForm() {
         {/* Footer Navigation */}
         <Text size="xs" className="text-center font-medium text-neutral-500 dark:text-neutral-400 font-sans mt-2">
             Already have an account ? {" "}
-            <Anchor component={Link} href="/login" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+            <Anchor component={Link} href="/login" c="notely" className="font-semibold hover:underline">
                 Sign in
             </Anchor>
         </Text>

@@ -14,12 +14,13 @@ export const apiClient = axios.create({
 //  Request interceptor to add the auth token to the request headers
 
 apiClient.interceptors.request.use((config) => {
-    const token = getCookie("auth_token")
+    const token = getCookie("accessToken")
     if (token && config.headers) {
         config.headers["Authorization"] = `Bearer ${token}`
     }
     return config
 }, (error) => Promise.reject(error))
+
 // Response interceptor to handle errors and log them
 
 apiClient.interceptors.response.use((response) => {
@@ -50,4 +51,7 @@ apiClient.interceptors.response.use((response) => {
     }
     return Promise.reject(error)
 })
+
+
+
 

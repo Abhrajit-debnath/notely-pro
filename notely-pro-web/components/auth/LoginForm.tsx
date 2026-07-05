@@ -53,7 +53,7 @@ export default function LoginForm() {
                 className="font-sans"
                 classNames={{
                     label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
-                    input: "bg-neutral-50 dark:bg-neutral-950 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 border-neutral-200 dark:border-neutral-800 transition-colors"
+                    input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors"
                 }}
             />
 
@@ -66,12 +66,12 @@ export default function LoginForm() {
                 className="font-sans"
                 classNames={{
                     label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
-                    input: "bg-neutral-50 dark:bg-neutral-950 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 border-neutral-200 dark:border-neutral-800 transition-colors",
+                    input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors",
                     innerInput: "bg-transparent border-0"
                 }}
             />
 
-            <Anchor component={Link} href="/forgot-password" className="text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline self-end">
+            <Anchor component={Link} href="/forgot-password" c="notely" className="text-xs font-medium hover:underline self-end">
                 Forgot password?
             </Anchor>
 
@@ -136,7 +136,7 @@ export default function LoginForm() {
         {/* Footer Navigation */}
         <Text size="xs" className="text-center font-medium text-neutral-500 dark:text-neutral-400 font-sans mt-2">
             Don&apos;t have an account ? {" "}
-            <Anchor component={Link} href="/register" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
+            <Anchor component={Link} href="/register" c="notely" className="font-semibold hover:underline">
                 Sign up
             </Anchor>
         </Text>
