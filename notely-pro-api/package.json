@@ -2,9 +2,11 @@
   "name": "notely-pro-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +24,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.0",
     "prisma": "^7.8.0",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.23.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {
