@@ -1,12 +1,14 @@
+import { Anchor } from "@mantine/core";
 import Link from "next/link";
 export default function NotFound() {
     return (
-    <div className="flex flex-col items-center justify-center h-screen">
+        <div className="flex flex-col items-center justify-center h-screen">
             <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
             <p className="text-lg mb-8">The page you are looking for does not exist.</p>
-            <Link href="/" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+            <Anchor c="#ffff" href="/" bg="notely.6" bdrs={"md"} px={10} py={8}>
                 Go to Home
-            </Link>
+            </Anchor>
+
         </div>
     );
 }
