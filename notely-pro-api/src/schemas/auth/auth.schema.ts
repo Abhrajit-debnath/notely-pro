@@ -5,7 +5,7 @@ const emailSchema = z
   .string({ error: "Email is required" })
   .trim()
   .toLowerCase()
-  .email("Please enter a valid email address");
+  .email("Please enter a valid email address")
 
 const signupPasswordSchema = z
   .string({ error: "Password is required" })
@@ -14,7 +14,7 @@ const signupPasswordSchema = z
   .regex(/[a-z]/, "Password must contain at least one lowercase letter")
   .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
   .regex(/[0-9]/, "Password must contain at least one number")
-  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character");
+  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character").optional()
 
 /**
  * Register / Signup Schema
@@ -28,11 +28,11 @@ export const registerSchema = z.object({
       .max(50, "Name must be at most 50 characters long"),
     email: emailSchema,
     password: signupPasswordSchema,
-    passwordConfirmation: z.string({ error: "Password confirmation is required" }),
+    passwordConfirmation: z.string({ error: "Password confirmation is required" }).optional(),
   }).refine((data) => data.password === data.passwordConfirmation, {
     message: "Passwords do not match",
     path: ["passwordConfirmation"],
-  }),
+  })
 });
 
 /**

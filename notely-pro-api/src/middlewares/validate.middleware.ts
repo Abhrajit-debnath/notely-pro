@@ -16,8 +16,9 @@ export const validate = (schema: ZodObject) => {
         } catch (error) {
             if (error instanceof ZodError) {
                 logger.error(error);
-
             }
+
+            next(error)
         }
     }
 }
