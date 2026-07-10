@@ -1,12 +1,10 @@
 import { Router } from "express";
-import { validate } from "../middlewares/validate.middleware.js";
-import { registerSchema } from "../schemas/auth/auth.schema.js";
 import registerRouter from "./auth/register.js";
-// import type {Router as RouterType} from "express"
+import loginRouter from "./auth/login.js";
 
-const router:Router = Router();
+const router: Router = Router();
 
-
-router.use("/api/auth/register",registerRouter);
+router.use("/api/auth/register", registerRouter);
+router.use("/api/auth/login", loginRouter);
 
 export default router;
