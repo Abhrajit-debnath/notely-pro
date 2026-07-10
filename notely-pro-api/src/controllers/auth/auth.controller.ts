@@ -12,8 +12,9 @@ export class RegisterController {
       const user = await this.registerService.registerUser(req.body);
 
       if (!user) {
-        new AppError(500, "User registration failed");
+        throw new AppError(500, "User registration failed");
       }
+
       // Exclude password from response data
       const { password, ...userData } = user;
 
@@ -33,13 +34,33 @@ export class LoginController {
       const user = await this.loginService.loginUser(req.body);
 
       if (!user) {
-        new AppError(500, "User login failed");
+        throw new AppError(500, "User login failed");
       }
-      // Include password from response data
-      const { ...userData } = user;
 
-      responseSender(res, 201, "User logged in successfully", userData);
-      logger.info(`User logged in successfully: ${user.email}`);
+      const { accessToken, refreshToken } = user;
+
+      if (!accessToken || !refreshToken) {
+        throw new AppError(500, "Failed to generate authentication tokens");
+      }
+
+      // set up cookie
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 48 * 1000
+      });
+
+      responseSender(res, 200, "User logged in successfully", user);
+      logger.info(`User logged in successfully: ${user.user.email}`);
     } catch (error) {
       next(error);
     }
