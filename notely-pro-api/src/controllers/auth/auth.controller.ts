@@ -11,7 +11,6 @@ export class RegisterController {
     try {
       const user = await this.registerService.registerUser(req.body);
 
-
       if (!user) {
         new AppError(500, "User registration failed");
       }

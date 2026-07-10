@@ -1,14 +1,10 @@
 import "dotenv/config";
 import express from "express";
-import type { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { pinoHttp } from 'pino-http';
 import { logger } from "./config/logger.js";
 import router from "./routes/index.js";
-import { ZodError } from "zod";
-import responseSender from "./globals/response.global.js";
-import { AppError } from "./globals/error.global.js";
-
+import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -30,24 +26,7 @@ app.get("/api-health", (req, res) => {
 });
 
 // Global Error Handler Middleware
-app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
-    logger.error(err);
-
-    if (err instanceof AppError) {
-        return responseSender(res, err.statusCode, err.message, null);
-    }
-
-    if (err instanceof ZodError) {
-        return responseSender(
-            res,
-            400,
-            "Validation Failed",
-            err.issues.map((e) => ({ field: e.path.join('.'), message: e.message }))
-        );
-    }
-
-    responseSender(res, 500, "Internal Server Error", null);
-});
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
      logger.info(`Server is running on port ${PORT}`);  
