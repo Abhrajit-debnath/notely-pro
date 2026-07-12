@@ -22,4 +22,15 @@ export class UserRepository {
             throw error;
         }
     };
+
+    updateUser = async (userId: string, userData: Prisma.UserUpdateInput): Promise<User> => {
+        try {
+            return await this.prisma.user.update({
+                where: { id: userId },
+                data: userData,
+            });
+        } catch (error) {
+            throw error;
+        }
+    };
 }
