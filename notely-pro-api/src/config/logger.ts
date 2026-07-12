@@ -1,7 +1,7 @@
 import pino from "pino"
 
 export const logger = pino({
-    level : "info",
+    level : "trace",
     transport : {
         target : "pino-pretty",
         options : {

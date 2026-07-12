@@ -4,7 +4,7 @@ import responseSender from "../globals/response.global.js";
 import { AppError } from "../globals/error.global.js";
 import { ZodError } from "zod";
 
-export const errorMiddleware = (err: unknown, req: Request, res: Response, next: NextFunction) => {
+export const errorMiddleware = (err: Error, req: Request, res: Response, next: NextFunction) => {
     logger.error(err);
 
     if (err instanceof AppError) {

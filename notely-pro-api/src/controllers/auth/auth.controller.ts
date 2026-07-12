@@ -34,6 +34,7 @@ export class LoginController {
       const user = await this.loginService.loginUser(req.body);
 
       if (!user) {
+        logger.error("User login failed");
         throw new AppError(500, "User login failed");
       }
 

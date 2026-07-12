@@ -4,6 +4,8 @@ import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { theme } from "./theme";
 import "./globals.css";
 import QueryProvider from "@/components/providers/queryClient/QueryProvider";
+import { Notifications } from '@mantine/notifications';
+import '@mantine/notifications/styles.css';
 
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -31,7 +33,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <QueryProvider>
-          <MantineProvider theme={theme} defaultColorScheme="dark">{children}
+          <MantineProvider theme={theme} defaultColorScheme="dark">
+            <Notifications position="top-center" />
+            {children}
           </MantineProvider>
         </QueryProvider>
       </body>

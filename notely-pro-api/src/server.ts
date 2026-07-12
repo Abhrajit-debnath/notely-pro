@@ -8,7 +8,10 @@ import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+}));
 app.use(express.json());
 
 // Register the HTTP request logger middleware
@@ -18,6 +21,9 @@ const PORT = process.env.PORT || 3000;
 
 // Attached main router
 app.use(router);
+
+// Disable the default Express headers
+app.disable('x-powered-by');
 
 // Health status
 app.get("/api-health", (req, res) => {

@@ -3,34 +3,60 @@
 import { TextInput, PasswordInput, Button, Divider, Anchor, Text, Title, Stack, Box, Group, UnstyledButton, Flex, Center } from "@mantine/core";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { useForm } from '@mantine/form';
+import { registerSchema, RegisterValues } from "@/schemas/auth.schema";
+import { useRegisterUser } from "./hooks/useRegisterUser";
+import { notify } from "@/notifications/config/notification.config";
 
 export default function RegisterForm() {
+
+    const { mutateAsync, isPending } = useRegisterUser()
+    const inputStyles = {
+        label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
+        input: "bg-neutral-50 font-medium dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors"
+    }
+
+    // Initialize form validation with Zod
+    const registerForm = useForm<RegisterValues>({
+        initialValues: {
+            name: '',
+            email: '',
+            password: '',
+            passwordConfirmation: ''
+        },
+        validate: (values) => {
+            const result = registerSchema.safeParse(values);
+            if (result.success) return {};
+
+            const errors: Record<string, string> = {};
+            result.error.issues.forEach((issue) => {
+                errors[issue.path.join(".")] = issue.message;
+            });
+            return errors;
+        }
+    });
+
+    // Form submit handler calls trigger mutate
+    const handleRegisterSubmit = async (values: RegisterValues) => {
+
+        await mutateAsync(values, {
+            onSuccess: () => {
+                notify.success("Account created successfully!", "You can now log in with your credentials.");
+            },
+            onError: (error: Error) => {
+                const apiMessage = (error as any)?.response?.data?.message || error.message || "An unexpected error occurred";
+
+                if (apiMessage === "Email already registered") {
+                    registerForm.setFieldError("email", "This email is already in use.");
+                } else {
+                    notify.error("Registration Error", apiMessage);
+                }
+
+            }
+        })
+    };
+
     return <Stack gap="lg" className="w-full">
-        {/* Logo  */}
-        {/* <Box className="flex justify-start">
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-7 h-7 text-indigo-600 dark:text-indigo-400"
-            >
-                <path
-                    d="M12 2L13.8 8.2L20.1 7.2L15.3 11.5L19.5 16.3L13.3 14.5L12 22L10.7 14.5L4.5 16.3L8.7 11.5L3.9 7.2L10.2 8.2L12 2Z"
-                    fill="currentColor"
-                />
-            </svg>
-
-            <Flex
-                direction="row"
-                align="center"
-                gap={5}
-                justify="center"
-            >
-                <Text size="lg">Notely</Text>
-                <Center component="span" c="notely.5" className="text-lg" fw={700}>Pro</Center>
-            </Flex>
-        </Box> */}
-
         {/* Heading Block */}
         <Stack gap={6}>
             <Title order={2} className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 font-sans">
@@ -42,43 +68,67 @@ export default function RegisterForm() {
         </Stack>
 
         {/* Main Form Fields */}
-        <Stack gap="md" component="form" onSubmit={(e) => e.preventDefault()}>
-            <TextInput
-                label="Your email"
-                placeholder="name@example.com"
-                required
-                size="sm"
-                radius="md"
-                className="font-sans"
-                classNames={{
-                    label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
-                    input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors"
-                }}
-            />
+        <form onSubmit={registerForm.onSubmit(handleRegisterSubmit)}>
+            <Stack gap="md">
+                <TextInput
+                    label="Your name"
+                    placeholder="John Doe"
+                    required
+                    size="sm"
+                    radius="md"
+                    classNames={inputStyles}
+                    {...registerForm.getInputProps("name")}
+                />
 
-            <PasswordInput
-                label="Password"
-                placeholder="Enter Password"
-                required
-                size="sm"
-                radius="md"
-                className="font-sans"
-                classNames={{
-                    label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
-                    input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors",
-                    innerInput: "bg-transparent border-0"
-                }}
-            />
+                <TextInput
+                    label="Your email"
+                    placeholder="name@example.com"
+                    required
+                    size="sm"
+                    radius="md"
+                    classNames={inputStyles}
+                    {...registerForm.getInputProps('email')}
+                />
 
-            <Button
-                type="submit"
-                size="md"
-                radius="md"
-                className="bg-indigo-600 hover:bg-indigo-700 font-semibold text-sm shadow-md transition-all mt-2"
-            >
-                Get Started
-            </Button>
-        </Stack>
+                <PasswordInput
+                    label="Password"
+                    placeholder="Enter Password"
+                    required
+                    size="sm"
+                    radius="md"
+                    classNames={{
+                        label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
+                        input: "bg-neutral-50 font-medium dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors",
+                        innerInput: "bg-transparent border-0"
+                    }}
+                    {...registerForm.getInputProps('password')}
+                />
+
+                <PasswordInput
+                    label="Confirm Password"
+                    placeholder="Confirm Password"
+                    required
+                    size="sm"
+                    radius="md"
+                    classNames={{
+                        label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
+                        input: "bg-neutral-50 dark:bg-neutral-950 font-medium border-neutral-200 dark:border-neutral-800 transition-colors",
+                        innerInput: "bg-transparent border-0 "
+                    }}
+                    {...registerForm.getInputProps('passwordConfirmation')}
+                />
+
+                <Button
+                    type="submit"
+                    size="md"
+                    radius="md"
+                    loading={isPending}
+                    className="bg-indigo-600 hover:bg-indigo-700 font-semibold text-sm shadow-md transition-all mt-2"
+                >
+                    Get Started
+                </Button>
+            </Stack>
+        </form>
 
         {/* Divider */}
         <Divider
@@ -116,16 +166,6 @@ export default function RegisterForm() {
                     <path fill="#34A853" d="M12 18.96c-3.09 0-5.73-2.5-6.65-5.96l-3.87 3C3.37 19.85 7.35 22.5 12 22.5c2.93 0 5.61-1.04 7.64-2.82l-3.76-2.91c-1.03.69-2.35 1.19-3.88 1.19z" />
                 </svg>
             </UnstyledButton>
-
-            {/* Facebook Button */}
-            {/* <UnstyledButton
-                className="h-10 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 flex items-center justify-center rounded-lg transition-colors bg-neutral-50/50 dark:bg-neutral-950/20"
-                aria-label="Register with Facebook"
-            >
-                <svg viewBox="0 0 24 24" fill="#1877F2" className="w-5 h-5">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-            </UnstyledButton> */}
         </Group>
 
         {/* Footer Navigation */}

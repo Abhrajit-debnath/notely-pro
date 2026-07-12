@@ -1,11 +1,52 @@
 "use client"
-
 import { TextInput, PasswordInput, Button, Divider, Anchor, Text, Title, Stack, Box, Group, UnstyledButton, Center, Flex } from "@mantine/core";
 import Link from "next/link";
-import { signIn} from "next-auth/react";
+import { signIn } from "next-auth/react";
+import { useLoginUser } from "./hooks/useLoginUser";
+import { loginSchema, LoginValues } from "@/schemas/auth.schema";
+import { useForm } from "@mantine/form";
+import { notify } from "@/notifications/config/notification.config";
 
 export default function LoginForm() {
+    const { mutateAsync, isPending } = useLoginUser()
 
+    const loginForm = useForm<LoginValues>({
+        initialValues: {
+            email: '',
+            password: '',
+
+        },
+        validate: (values) => {
+            const result = loginSchema.safeParse(values);
+            if (result.success) return {};
+
+            const errors: Record<string, string> = {};
+            result.error.issues.forEach((issue) => {
+                errors[issue.path.join(".")] = issue.message;
+            });
+            return errors;
+        }
+    });
+
+    // Form submit handler calls trigger mutate
+    const handleLoginSubmit = async (values: LoginValues) => {
+        await mutateAsync(values, {
+            onSuccess: () => {
+                notify.success("Logged in successfully!", "You can now access your account.");
+            },
+            onError: (error: Error) => {
+                const apiMessage = (error as any)?.response?.data?.message || error.message || "An unexpected error occurred";
+
+                if (apiMessage === "Email already registered") {
+                    loginForm.setFieldError("email", "This email is already in use.");
+                } else {
+                    notify.error("Login Error", apiMessage);
+                }
+
+            }
+        })
+
+    };
 
 
     return <Stack gap="lg" className="w-full" >
@@ -30,7 +71,8 @@ export default function LoginForm() {
             >
                 <Text size="lg" >Notely</Text>
                 <Center component="span" className="text-lg" c="notely.5" fw={700}>Pro</Center>
-            </Flex>        </Box> */}
+            </Flex>        
+            </Box> */}
 
         {/* Heading Block */}
         <Stack gap={6}>
@@ -43,47 +85,52 @@ export default function LoginForm() {
         </Stack>
 
         {/* Main Form Fields */}
-        <Stack gap="md" component="form" onSubmit={(e) => e.preventDefault()}>
-            <TextInput
-                label="Your email"
-                placeholder="name@example.com"
-                required
-                size="sm"
-                radius="md"
-                className="font-sans"
-                classNames={{
-                    label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
-                    input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors"
-                }}
-            />
+        <form onSubmit={loginForm.onSubmit(handleLoginSubmit)}>
+            <Stack gap="md">
+                <TextInput
+                    label="Your email"
+                    placeholder="name@example.com"
+                    required
+                    size="sm"
+                    radius="md"
+                    className="font-sans"
+                    classNames={{
+                        label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
+                        input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors"
+                    }}
+                    {...loginForm.getInputProps('email')}
+                />
 
-            <PasswordInput
-                label="Password"
-                placeholder="••••••••••••"
-                required
-                size="sm"
-                radius="md"
-                className="font-sans"
-                classNames={{
-                    label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
-                    input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors",
-                    innerInput: "bg-transparent border-0"
-                }}
-            />
+                <PasswordInput
+                    label="Password"
+                    placeholder="••••••••••••"
+                    required
+                    size="sm"
+                    radius="md"
+                    className="font-sans"
+                    classNames={{
+                        label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
+                        input: "bg-neutral-50 dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors",
+                        innerInput: "bg-transparent border-0"
+                    }}
+                    {...loginForm.getInputProps('password')}
+                />
 
-            <Anchor component={Link} href="/forgot-password" c="notely" className="text-xs font-medium hover:underline self-end">
-                Forgot password?
-            </Anchor>
+                <Anchor component={Link} href="/forgot-password" c="notely" className="text-xs font-medium hover:underline self-end">
+                    Forgot password?
+                </Anchor>
 
-            <Button
-                type="submit"
-                size="md"
-                radius="md"
-                className="bg-indigo-600 hover:bg-indigo-700 font-semibold text-sm shadow-md transition-all mt-2"
-            >
-                Sign In
-            </Button>
-        </Stack>
+                <Button
+                    type="submit"
+                    loading={isPending}
+                    size="md"
+                    radius="md"
+                    className="bg-indigo-600 hover:bg-indigo-700 font-semibold text-sm shadow-md transition-all mt-2"
+                >
+                    Sign In
+                </Button>
+            </Stack>
+        </form>
 
         {/* Divider */}
         <Divider
@@ -99,7 +146,7 @@ export default function LoginForm() {
         <Group grow gap="xs">
             {/* GitHub Button */}
             <UnstyledButton
-              onClick={()=>signIn("github")}
+                onClick={() => signIn("github")}
                 className="h-10 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 flex items-center justify-center rounded-lg transition-colors bg-neutral-50/50 dark:bg-neutral-950/20"
                 aria-label="Sign in with GitHub"
             >
@@ -110,7 +157,7 @@ export default function LoginForm() {
 
             {/* Google Button */}
             <UnstyledButton
-            onClick={()=>signIn("google")}
+                onClick={() => signIn("google")}
                 className="h-10 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 flex items-center justify-center rounded-lg transition-colors bg-neutral-50/50 dark:bg-neutral-950/20"
                 aria-label="Sign in with Google"
             >
@@ -141,4 +188,6 @@ export default function LoginForm() {
             </Anchor>
         </Text>
     </Stack>
+
+
 }
