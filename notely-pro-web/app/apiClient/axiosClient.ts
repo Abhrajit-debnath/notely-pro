@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getCookie, setCookie } from "cookies-next";
+import { getSession } from "next-auth/react";
 
 
 export const apiClient = axios.create({
@@ -8,18 +9,31 @@ export const apiClient = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
-    withCredentials:true
+    withCredentials: true
 
 })
 
 //  Request interceptor to add the auth token to the request headers
 
-apiClient.interceptors.request.use((config) => {
-    const token = getCookie("accessToken")
-    if (token && config.headers) {
-        config.headers["Authorization"] = `Bearer ${token}`
+apiClient.interceptors.request.use(async (config) => {
+    // const token = getCookie("accessToken")
+    // if (token && config.headers) {
+    //     config.headers["Authorization"] = `Bearer ${token}`
+    // }
+    // return config
+    const session = await getSession() as any
+    let token = session?.accessToken;
+
+    if (!token) {
+        token = getCookie("accessToken");
     }
-    return config
+
+    if (token && config.headers) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+
+
 }, (error) => Promise.reject(error))
 
 // Response interceptor to handle errors and log them

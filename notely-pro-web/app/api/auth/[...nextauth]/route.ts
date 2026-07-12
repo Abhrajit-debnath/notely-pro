@@ -1,3 +1,4 @@
+import { apiClient } from "@/app/apiClient/axiosClient";
 import NextAuth from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
@@ -21,12 +22,55 @@ export const authOptions = {
             clientSecret: process.env.GOOGLE_SECRET
         })
     ],
-    // callbacks: {
-    //     async signIn({user,account,profile,email,credentials}) {
-            
-    //         return true; 
-    //     }
-    // }
+    callbacks: {
+        async signIn({ user, account, profile, email, credentials }:any):Promise<any> {
+
+
+            const oAuthPayload = {
+                email: user.email,
+                name: user.name,
+                image: user.image,
+                provider: account.provider,
+                providerId: account.providerAccountId
+            }
+            try {
+                const oAuthResponse = await apiClient.post("/auth/oauth", oAuthPayload)
+
+                if (oAuthResponse && oAuthResponse.status === 200) {
+                    user.accessToken = oAuthResponse.data.accessToken;
+                    user.refreshToken = oAuthResponse.data.refreshToken;
+
+                    return true
+                }
+
+                return false
+
+
+
+
+            } catch (error) {
+                console.error("Backend OAuth login failed:", error);
+                return error
+            }
+
+
+        },
+        async jwt({ token, user }: any) {
+            if (user) {
+                token.accessToken = user.accessToken;
+                token.refreshToken = user.refreshToken;
+            }
+            return token;
+        },
+        async session({ session, token }: any) {
+            if (token) {
+                session.user.accessToken = token.accessToken;
+                session.user.refreshToken = token.refreshToken;
+            }
+            return session;
+        }
+    }
+
 };
 
 const handler = NextAuth(authOptions);
