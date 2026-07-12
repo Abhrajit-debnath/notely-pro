@@ -34,9 +34,9 @@ export const authOptions = {
                 providerId: account.providerAccountId
             }
             try {
-                const oAuthResponse = await apiClient.post("/auth/oauth", oAuthPayload)
+                const oAuthResponse: any = await apiClient.post("/api/auth/oauth", oAuthPayload)
 
-                if (oAuthResponse && oAuthResponse.status === 200) {
+                if (oAuthResponse && oAuthResponse.data) {
                     user.accessToken = oAuthResponse.data.accessToken;
                     user.refreshToken = oAuthResponse.data.refreshToken;
 
@@ -50,7 +50,7 @@ export const authOptions = {
 
             } catch (error) {
                 console.error("Backend OAuth login failed:", error);
-                return error
+                return false
             }
 
 

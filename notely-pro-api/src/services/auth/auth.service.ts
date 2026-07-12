@@ -59,7 +59,7 @@ export class LoginService {
         existingUser.password
       );
       if (!isPasswordValid) {
-        throw new AppError(400, "Invalid password");
+        throw new AppError(400, "Invalid credentials");
       }
 
      

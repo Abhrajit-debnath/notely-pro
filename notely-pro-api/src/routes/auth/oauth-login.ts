@@ -1,19 +1,17 @@
 import { Router } from "express";
 import { prisma } from "../../config/db/db.js";
 import { UserRepository } from "../../repositories/auth.repository.js";
-import { RegisterService } from "../../services/auth/auth.service.js";
-import { RegisterController } from "../../controllers/auth/auth.controller.js";
-import { registerSchema } from "../../schemas/auth/auth.schema.js";
-import { validate } from "../../middlewares/validate.middleware.js";
+import { OAuthService } from "../../services/auth/oAuth.service.js";
+import { OAuthController } from "../../controllers/auth/oAuth.controller.js";
 
 const router: Router = Router();
 
 // Instantiate dependencies
 const userRepository = new UserRepository(prisma);
-const registerService = new RegisterService(userRepository);
-const registerController = new RegisterController(registerService);
+const oauthService = new OAuthService(userRepository);
+const oauthController = new OAuthController(oauthService);
 
-// oAuth route with the middleware and controller method
-router.post("/",registerController.registerUser);
+// oAuth route with the controller method
+router.post("/", oauthController.oauthLogin);
 
 export default router;

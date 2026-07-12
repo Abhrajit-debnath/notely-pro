@@ -1,29 +1,26 @@
 "use client"
-
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { TextInput, PasswordInput, Button, Divider, Anchor, Text, Title, Stack, Box, Group, UnstyledButton, Flex, Center } from "@mantine/core";
 import Link from "next/link";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useForm } from '@mantine/form';
 import { registerSchema, RegisterValues } from "@/schemas/auth.schema";
 import { useRegisterUser } from "./hooks/useRegisterUser";
 import { notify } from "@/notifications/config/notification.config";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
+
 
 export default function RegisterForm() {
-    const { data, status } = useSession()
-    const router = useRouter()
-    const { mutateAsync, isPending } = useRegisterUser()
-
+    const { data, status } = useSession();
+    const router = useRouter();
 
     useEffect(() => {
         if (status === "authenticated") {
-            notify.success("Logged in successfully!", "You can now access your account.");
             router.push("/dashboard");
         }
     }, [status, router]);
 
-
+    const { mutateAsync, isPending } = useRegisterUser();
     const inputStyles = {
         label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
         input: "bg-neutral-50 font-medium dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors"
@@ -55,12 +52,13 @@ export default function RegisterForm() {
         await mutateAsync(values, {
             onSuccess: () => {
                 notify.success("Account created successfully!", "You can now log in with your credentials.");
+                router.push("/login");
             },
             onError: (error: Error) => {
                 const apiMessage = (error as any)?.response?.data?.message || error.message || "An unexpected error occurred";
 
                 if (apiMessage === "Email already registered") {
-                    registerForm.setFieldError("email", "This email is already in use.");
+                    registerForm.setFieldError("email", "This email is registered.");
                 } else {
                     notify.error("Registration Error", apiMessage);
                 }
@@ -68,6 +66,12 @@ export default function RegisterForm() {
             }
         })
     };
+
+    const handleOAuthLogin = async (provider: "github" | "google") => {
+        notify.loading("Redirecting...", "Redirecting you to the authentication provider.");
+        await signIn(provider, { callbackUrl: "/dashboard" });
+    }
+
 
     return <Stack gap="lg" className="w-full">
         {/* Heading Block */}
@@ -157,7 +161,7 @@ export default function RegisterForm() {
         <Group grow gap="xs">
             {/* GitHub Button */}
             <UnstyledButton
-                onClick={() => signIn("github")}
+                onClick={() => handleOAuthLogin("github")}
                 className="h-10 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 flex items-center justify-center rounded-lg transition-colors bg-neutral-50/50 dark:bg-neutral-950/20"
                 aria-label="Register with GitHub"
             >
@@ -168,7 +172,7 @@ export default function RegisterForm() {
 
             {/* Google Button */}
             <UnstyledButton
-                onClick={() => signIn("google")}
+                onClick={() => handleOAuthLogin("google")}
                 className="h-10 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 flex items-center justify-center rounded-lg transition-colors bg-neutral-50/50 dark:bg-neutral-950/20"
                 aria-label="Register with Google"
             >

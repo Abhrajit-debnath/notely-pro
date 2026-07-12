@@ -12,9 +12,23 @@ declare global {
     }
 }
 
-export const authMiddleware = (req: any, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")?.[1];
+const parseCookies = (cookieHeader: string) => {
+    const list: Record<string, string> = {};
+    if (!cookieHeader) return list;
+    cookieHeader.split(';').forEach((cookie) => {
+        const parts = cookie.split('=');
+        list[parts.shift()!.trim()] = decodeURI(parts.join('='));
+    });
+    return list;
+};
 
+export const authMiddleware = (req: any, res: Response, next: NextFunction) => {
+    let token = req.headers.authorization?.split(" ")?.[1];
+
+    if (!token && req.headers.cookie) {
+        const cookies = parseCookies(req.headers.cookie);
+        token = cookies["accessToken"];
+    }
 
     if (!token) {
         responseSender(res, 401, "Unauthorized", null);
@@ -35,6 +49,4 @@ export const authMiddleware = (req: any, res: Response, next: NextFunction) => {
     } catch (error) {
         next(error);
     }
-
-    next();
 }

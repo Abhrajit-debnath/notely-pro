@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TextInput, PasswordInput, Button, Divider, Anchor, Text, Title, Stack, Box, Group, UnstyledButton, Center, Flex, LoadingOverlay } from "@mantine/core";
 import Link from "next/link";
-import { signIn, useSession ,signOut} from "next-auth/react";
+import { signIn, useSession, signOut } from "next-auth/react";
 import { useLoginUser } from "./hooks/useLoginUser";
 import { loginSchema, LoginValues } from "@/schemas/auth.schema";
 import { useForm } from "@mantine/form";
@@ -16,7 +16,6 @@ export default function LoginForm() {
 
     useEffect(() => {
         if (status === "authenticated") {
-            notify.success("Logged in successfully!", "You can now access your account.");
             router.push("/dashboard");
         }
     }, [status, router]);
@@ -44,13 +43,15 @@ export default function LoginForm() {
         await mutateAsync(values, {
             onSuccess: () => {
                 notify.success("Logged in successfully!", "You can now access your account.");
-                router.push("/dashboard");
+                router.replace("/dashboard");
             },
             onError: (error: Error) => {
                 const apiMessage = (error as any)?.response?.data?.message || error.message || "An unexpected error occurred";
 
-                if (apiMessage === "Email already registered") {
-                    loginForm.setFieldError("email", "This email is already in use.");
+                if (apiMessage === "User not found") {
+                    loginForm.setFieldError("email", "No account found with this email.");
+                } else if (apiMessage === "Invalid password") {
+                    loginForm.setFieldError("password", "Incorrect credentials.");
                 } else {
                     notify.error("Login Error", apiMessage);
                 }
@@ -61,7 +62,8 @@ export default function LoginForm() {
     };
 
     const handleOAuthLogin = async (provider: "github" | "google") => {
-        await signIn(provider)
+        notify.loading("Redirecting...", "Redirecting you to the authentication provider.");
+        await signIn(provider, { callbackUrl: "/dashboard" });
     }
 
     return (

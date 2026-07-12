@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Flex, Text, Avatar, Button, NavLink, Divider, Group, ActionIcon, ScrollArea, Tooltip } from "@mantine/core";
+import { Box, Flex, Text, Avatar, Button, NavLink, Divider, Group, ActionIcon, ScrollArea, Tooltip, useMantineColorScheme, useComputedColorScheme } from "@mantine/core";
 import Link from "next/link";
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -18,7 +18,12 @@ import {
     IconMoon
 } from "@tabler/icons-react";
 import { useState } from "react";
-import { usePathname } from "next/dist/client/components/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { deleteCookie } from "cookies-next";
+import { apiClient } from "@/app/apiClient/axiosClient";
+import { notify } from "@/notifications/config/notification.config";
+
 const folders = [
     { name: "Projects", count: 4, color: "blue" },
     { name: "Personal", count: 2, color: "teal" },
@@ -26,6 +31,30 @@ const folders = [
 ];
 
 export default function AppSidebar() {
+    const router = useRouter();
+    const { setColorScheme } = useMantineColorScheme();
+    const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
+    const toggleColorScheme = () => {
+        setColorScheme(computedColorScheme === 'dark' ? 'light' : 'dark');
+    };
+
+    const handleLogout = async () => {
+        const notifyId = notify.loading("Logging Out", "Please wait while we log you out...");
+         await new Promise((resolve) => setTimeout(resolve, 4000));
+        try {
+            await apiClient.post("/api/auth/logout");
+            notify.update(notifyId, "Logged Out", "You have been logged out successfully.", "green");
+           
+        } catch (error) {
+            console.error("Backend logout failed:", error);
+            notify.update(notifyId, "Logout Failed", "An error occurred while logging out.", "red");
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+        }
+        deleteCookie("accessToken");
+        deleteCookie("refreshToken");
+        await signOut({ callbackUrl: "/login" });
+    };
 
     const [collapsed, setCollapsed] = useState(false);
     const pathname = usePathname();
@@ -110,7 +139,7 @@ export default function AppSidebar() {
                         <Tooltip label="New Note" position="right" withArrow>
                             <ActionIcon
                                 variant="filled"
-                                     bg={"notely.6"}
+                                bg={"notely.6"}
                                 size="lg"
                                 className="bg-indigo-600 hover:bg-indigo-700 w-full rounded-xl shadow-md"
                             >
@@ -258,7 +287,7 @@ export default function AppSidebar() {
                 />
 
                 {/* Theme & Logout Buttons */}
-                {/* <Flex align="center" justify={collapsed ? "center" : "space-between"} gap="xs">
+                <Flex align="center" justify={collapsed ? "center" : "space-between"} gap="xs" direction={collapsed ? "column" : "row"}>
                     <ActionIcon
                         variant="default"
                         size="lg"
@@ -269,17 +298,30 @@ export default function AppSidebar() {
                         {computedColorScheme === "dark" ? <IconSun size={18} className="text-amber-400" /> : <IconMoon size={18} className="text-indigo-900" />}
                     </ActionIcon>
 
-                    {!collapsed && (
+                    {collapsed ? (
+                        <Tooltip label="Logout" position="right" withArrow>
+                            <ActionIcon
+                                variant="subtle"
+                                color="red"
+                                size="lg"
+                                onClick={handleLogout}
+                                className="rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20"
+                            >
+                                <IconLogout size={20} />
+                            </ActionIcon>
+                        </Tooltip>
+                    ) : (
                         <Button
                             variant="subtle"
                             color="red"
+                            onClick={handleLogout}
                             leftSection={<IconLogout size={16} />}
                             className="rounded-xl font-sans text-xs font-semibold hover:bg-red-50 dark:hover:bg-red-950/20"
                         >
                             Logout
                         </Button>
                     )}
-                </Flex> */}
+                </Flex>
             </Box>
         </Box>
     )

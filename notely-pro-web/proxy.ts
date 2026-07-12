@@ -1,23 +1,25 @@
 import { getToken } from "next-auth/jwt";
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
 import type { NextRequest } from "next/server";
 
-export const proxy = async (req: NextRequest, res: NextResponse) => {
+export const proxy = async (req: NextRequest) => {
     const oauthToken = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const accessToken = oauthToken?.accessToken || req.cookies.get("accessToken")?.value;
-    const isAuthenticated = !accessToken || !oauthToken;
+    const isAuthenticated = !!accessToken;
     const pathname = req.nextUrl.pathname;
 
-    if (!isAuthenticated && pathname !== '/dashboard') {
-        NextResponse.redirect(new URL("/login", req.url))
-
-    } else if (isAuthenticated && pathname === '/login') {
-        NextResponse.redirect(new URL("/dashboard", req.url))
+    if (!isAuthenticated && pathname.startsWith('/dashboard')) {
+        return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    NextResponse.next()
-}
+   
+    if (isAuthenticated && (pathname === '/login' || pathname === '/register')) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    return NextResponse.next();
+};
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/login",]
-}
+    matcher: ["/dashboard/:path*", "/login", "/register"]
+};
