@@ -7,7 +7,7 @@ export interface TokenPayload {
 }
 
 // Helper to retrieve JWT secrets safely from environment
-const getSecret = (envVar: string): string => {
+export const getSecret = (envVar: string): string => {
   const secret = process.env[envVar];
   if (!secret) {
     throw new AppError(

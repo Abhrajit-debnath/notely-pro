@@ -2,15 +2,28 @@
 
 import { TextInput, PasswordInput, Button, Divider, Anchor, Text, Title, Stack, Box, Group, UnstyledButton, Flex, Center } from "@mantine/core";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useForm } from '@mantine/form';
 import { registerSchema, RegisterValues } from "@/schemas/auth.schema";
 import { useRegisterUser } from "./hooks/useRegisterUser";
 import { notify } from "@/notifications/config/notification.config";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function RegisterForm() {
-
+    const { data, status } = useSession()
+    const router = useRouter()
     const { mutateAsync, isPending } = useRegisterUser()
+
+
+    useEffect(() => {
+        if (status === "authenticated") {
+            notify.success("Logged in successfully!", "You can now access your account.");
+            router.push("/dashboard");
+        }
+    }, [status, router]);
+
+
     const inputStyles = {
         label: "font-semibold text-xs text-neutral-700 dark:text-neutral-300 mb-1.5",
         input: "bg-neutral-50 font-medium dark:bg-neutral-950 border-neutral-200 dark:border-neutral-800 transition-colors"

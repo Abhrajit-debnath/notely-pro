@@ -16,11 +16,7 @@ export const apiClient = axios.create({
 //  Request interceptor to add the auth token to the request headers
 
 apiClient.interceptors.request.use(async (config) => {
-    // const token = getCookie("accessToken")
-    // if (token && config.headers) {
-    //     config.headers["Authorization"] = `Bearer ${token}`
-    // }
-    // return config
+
     const session = await getSession() as any
     let token = session?.accessToken;
 

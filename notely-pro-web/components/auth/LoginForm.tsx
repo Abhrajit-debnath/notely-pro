@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TextInput, PasswordInput, Button, Divider, Anchor, Text, Title, Stack, Box, Group, UnstyledButton, Center, Flex, LoadingOverlay } from "@mantine/core";
 import Link from "next/link";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession ,signOut} from "next-auth/react";
 import { useLoginUser } from "./hooks/useLoginUser";
 import { loginSchema, LoginValues } from "@/schemas/auth.schema";
 import { useForm } from "@mantine/form";
