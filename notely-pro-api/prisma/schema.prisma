@@ -8,14 +8,25 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid()) 
-  email     String   @unique
-  name      String?
-  image     String?
-  password  String? 
-  provider  String?
-  providerId String?
-  passwordConfirmation String?  
+  id                   String   @id @default(uuid())
+  email                String   @unique
+  name                 String?
+  image                String?
+  password             String?
+  provider             String?
+  providerId           String?
+  passwordConfirmation String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  notes                Note[]
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

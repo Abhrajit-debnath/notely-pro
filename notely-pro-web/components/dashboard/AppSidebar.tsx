@@ -41,9 +41,10 @@ export default function AppSidebar() {
 
     const handleLogout = async () => {
         const notifyId = notify.loading("Logging Out", "Please wait while we log you out...");
-         await new Promise((resolve) => setTimeout(resolve, 4000));
+        
         try {
             await apiClient.post("/api/auth/logout");
+             await new Promise((resolve) => setTimeout(resolve, 4000));
             notify.update(notifyId, "Logged Out", "You have been logged out successfully.", "green");
            
         } catch (error) {

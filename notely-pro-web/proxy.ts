@@ -13,7 +13,7 @@ export const proxy = async (req: NextRequest) => {
     }
 
    
-    if (isAuthenticated && (pathname === '/login' || pathname === '/register')) {
+    if (isAuthenticated && (pathname === '/login' || pathname === '/register' || pathname === '/')) {
         return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
@@ -21,5 +21,5 @@ export const proxy = async (req: NextRequest) => {
 };
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/login", "/register"]
+    matcher: ["/dashboard/:path*", "/login", "/register","/"]
 };
